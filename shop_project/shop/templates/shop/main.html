@@ -5,13 +5,13 @@
     Hi, pass your name here to log in. <br>
     <form id = "form_id", name = "client_form", method = "get">
     Name: <input type="text" id="client_name"/>
-    <input type = "button" value = "Submit" onclick = "getClientUrl()">
+    <input type = "button" value = "Submit" onclick = "getClientUrl(this.form)">
     </form>
     <script type="text/javascript">
-        function getClientUrl(){
+        function getClientUrl(form){
             var str = "/shop/";
-            document.getElementById("form_id").action = str + document.getElementById('client_name').value;
-            document.getElementById("form_id").submit();
+            form.action = str + document.getElementById('client_name').value;
+            form.submit();
         }
     </script>
 </p>
