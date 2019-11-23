@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
+<!-- <script type="text/javascript" src = 'scripts/getUrl.js'></script> -->
+<script type="text/javascript">
+    function getClientUrl(form){
+    var str = "/shop/";
+    form.action = str + document.getElementById('client_name').value;
+    form.submit();
+}
+</script>
  <h2>Shop: Zoo Animations For Curious Animators</h2>
  <p>
     Hi, pass your name here to log in. <br>
@@ -7,12 +15,5 @@
     Name: <input type="text" id="client_name"/>
     <input type = "button" value = "Submit" onclick = "getClientUrl(this.form)">
     </form>
-    <script type="text/javascript">
-        function getClientUrl(form){
-            var str = "/shop/";
-            form.action = str + document.getElementById('client_name').value;
-            form.submit();
-        }
-    </script>
 </p>
 {% endblock %}
