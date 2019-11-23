@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+ <h2>Shop: Zoo Animations For Curious Animators</h2>
+ <p>
+    Hi, pass your name here to log in. <br>
+    <form id = "form_id", name = "client_form", method = "get">
+    Name: <input type="text" id="client_name"/>
+    <input type = "button" value = "Submit" onclick = "getClientUrl()">
+    </form>
+    <script type="text/javascript">
+        function getClientUrl(){
+            var str = "/shop/";
+            document.getElementById("form_id").action = str + document.getElementById('client_name').value;
+            document.getElementById("form_id").submit();
+        }
+    </script>
+</p>
+{% endblock %}
