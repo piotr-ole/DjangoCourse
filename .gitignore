@@ -1,4 +1,4 @@
 .vscode/
 shop_project/shop/__pycache__/
 shop_project/shop_project/_pycache__/
-django_workspace.code-workspace
+*.code-workspace
