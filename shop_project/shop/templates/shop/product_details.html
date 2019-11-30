@@ -1,18 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Product details</h3>
-{% for product in products %}
-    {% if  product.id  == product_id %}
-        <h3>ID</h3>
-            {{ product.id }}
-        <h3>Name</h3>
-            {{ product.name }}
-        <h3>Author</h3>
-            {{ product.author }}
-        <h3>Description</h3>
-            {{ product.description }}
-        <h3>Price</h3>
-            {{ product.price }}
-    {% endif %}
-{% endfor %}
+    <h3>ID</h3>
+        {{ product.id }}
+    <h3>Name</h3>
+        {{ product.name }}
+    <h3>Weight</h3>
+        {{ product.weight }}
+    <h3>Description</h3>
+        {{ product.description }}
+    <h3>Price</h3>
+        {{ product.price }}
+<br><br>
+<a href=".">Go back to products</a>
 {% endblock %}
