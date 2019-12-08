@@ -1,4 +1,5 @@
 from django.db import models
+import pdb
 
 # Create your models here.
 
@@ -39,10 +40,19 @@ class Order(models.Model):
 
     def get_total_price(self):
         total = 0
-        ordered_products = OrderedProduct.objects.filter(order=self)
+        #pdb.set_trace()
+        ordered_products = OrderedProduct.objects.filter(order=self.id)
         for ordered_product in ordered_products:
             total += ordered_product.amount * ordered_product.product.price
-            return total
+        return total
+
+    def get_product_list(self):
+        products = []
+        #pdb.set_trace()
+        ordered_products = OrderedProduct.objects.filter(order=self.id)
+        for ordered_product in ordered_products:
+            products.append({ 'name' : ordered_product.product.name, 'amount' : ordered_product.amount, 'price' : ordered_product.product.price })
+        return products
 
 
 class OrderedProduct(models.Model):
@@ -50,3 +60,8 @@ class OrderedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     amount = models.IntegerField(default=1)
+
+
+class Complaint(models.Model):
+    name = models.CharField(max_length=100)
+    message = models.CharField(max_length=3000)

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Order summary</h3>
+<h4>Product &nbsp;&nbsp;&nbsp;&nbsp; Amount &nbsp;&nbsp;&nbsp;&nbsp; Price</h4>
+{% for product in products %}
+{{ product.name }} &nbsp;&nbsp;&nbsp;&nbsp; {{ product.amount }} &nbsp;&nbsp;&nbsp;&nbsp; {{ product.price }}<br/>
+{% endfor %}
+<h4>Total price : {{ total_price }}</h4>
+{% endblock %}

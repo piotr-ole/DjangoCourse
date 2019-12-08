@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Order form</h3>
-<form action="/order/" method="post">
+<h3>Complaint form</h3>
+<form action="/complaint/" method="post">
     {% csrf_token %}
-    {{ form|linebreaksbr }}
+    {{ form }}
     <input type="submit" value="Submit"> </form>
 {% endblock %}

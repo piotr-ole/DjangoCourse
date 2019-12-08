@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
-from .forms import OrderForm
-from .models import Product, Order
+from .forms import OrderForm, ComplaintForm
+from .models import Product, Order, Complaint
 
 shop_introduction = "Welcome in the shop: \"Zoo Animations For Curious Animators\"!"
 
@@ -36,8 +36,8 @@ def product_details(request, product_id):
 def order_details(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
     total_price = order.get_total_price()
-    return HttpResponse(total_price)
-
+    products = order.get_product_list()
+    return render(request, "shop/order_details.html", {'total_price' : total_price, 'products' : products})
 
 def order(request):
     if request.method == 'POST':
@@ -58,3 +58,21 @@ def order(request):
     else:
         form = OrderForm()
     return render(request, "shop/order_form.html", {"form": form})
+
+def complaint(request):
+    if request.method == 'POST':
+        form =  ComplaintForm(request.POST)
+        if form.is_valid():
+            complaint = Complaint(
+                name=form.cleaned_data['name'],
+                message = form.cleaned_data['message']
+            )
+            complaint.save()
+            return HttpResponseRedirect('/complaint/'+str(complaint.id))
+    else:
+        form =  ComplaintForm()
+    return render(request, "shop/complaint_form.html", {"form": form})
+
+def complaint_details(request, complaint_id):
+    complaint = get_object_or_404(Complaint, pk=complaint_id)
+    return render(request, "shop/complaint_details.html", {'name' : complaint.name , 'message' : complaint.message})
