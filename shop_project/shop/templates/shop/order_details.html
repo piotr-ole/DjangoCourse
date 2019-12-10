@@ -1,9 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
+
 <h3>Order summary</h3>
-<h4>Product &nbsp;&nbsp;&nbsp;&nbsp; Amount &nbsp;&nbsp;&nbsp;&nbsp; Price</h4>
+<table width="300" cellspacing="0" cellpadding="0">
+    <tbody>
+        <tr>
+            <td><h4>Product</h4></td>
+            <td><h4>Amount</h4></td>
+            <td><h4>Price</h4></td>
+        </tr>
 {% for product in products %}
-{{ product.name }} &nbsp;&nbsp;&nbsp;&nbsp; {{ product.amount }} &nbsp;&nbsp;&nbsp;&nbsp; {{ product.price }}<br/>
+    <tr>
+        <td>{{ product.name }}</td>
+        <td>{{ product.amount }}</td>
+        <td>{{ product.price }}</td>
+    </tr>
 {% endfor %}
-<h4>Total price : {{ total_price }}</h4>
+    <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+            <td><h4>Total price</h4></td>
+            <td></td>
+            <td><h4>{{ total_price }}</h4></td>
+        </tr>
+    </tbody>
+</table>
 {% endblock %}
