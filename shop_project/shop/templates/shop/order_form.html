@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h3>Order form</h3>
+<ul> {% for product in products %} <li>{{ product.name }} ({{ product.price }})</li> {% endfor %}</ul>
 <form action="/order/" method="post">
     {% csrf_token %}
     {{ form|linebreaksbr }}

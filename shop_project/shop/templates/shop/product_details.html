@@ -2,15 +2,21 @@
 {% block content %}
 <h2>Product details</h3>
     <h3>ID</h3>
-        {{ product.id }}
+    {{ product.id }}
     <h3>Name</h3>
-        {{ product.name }}
+    {{ product.name }}
     <h3>Weight</h3>
-        {{ product.weight }}
+    {{ product.weight }}
     <h3>Description</h3>
-        {{ product.description }}
+    {{ product.description }}
     <h3>Price</h3>
-        {{ product.price }}
-<br><br>
-<a href=".">Go back to products</a>
-{% endblock %}
+    {{ product.price }}
+    <br><br>
+    <form action="/cart/add/" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="item_id" value="{{ product.id }}">
+        <input type="submit" value="Add to cart">
+    </form>
+
+    <a href=".">Go back to products</a>
+    {% endblock %}
