@@ -1,8 +1,10 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
-from .forms import OrderForm, ComplaintForm
-from .models import Product, Order, Complaint, OrderedProduct
+from .forms import OrderForm, ComplaintForm, ReviewForm
+from .models import Product, Order, Complaint, OrderedProduct, Review
+import pdb
+from statistics import mean
 
 shop_introduction = "Welcome in the shop: \"Zoo Animations For Curious Animators\"!"
 
@@ -29,8 +31,20 @@ def products_list(request):
 
 def product_details(request, product_id):
     product = Product.objects.get(id=product_id)
-    context = {'product': product}
+    reviews = list(Review.objects.all())
+    reviews = [review for review in reviews if review.product.id == product_id]
+    form = ReviewForm()
+    context = {'product': product,
+               'reviews': reviews, 'form': form,
+               'mean_rating': mean_rating(reviews)}
     return render(request, "shop/product_details.html", context)
+
+
+def mean_rating(reviews):
+    if reviews != []:
+        return mean([r.rating for r in reviews])
+    else:
+        return 'No ratings so far'
 
 
 def order_details(request, order_id):
@@ -106,3 +120,19 @@ def add_to_cart(request):
         request.session['cart'].append(request.POST['item_id'])
         request.session.modified = True
     return HttpResponseRedirect('/cart')
+
+# Review handling
+
+
+def add_review(request):
+    # POST ONLY
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = Review(
+                product=Product.objects.get(pk=request.POST['product_id']),
+                rating=form.cleaned_data['rating'],
+                comment=form.cleaned_data['comment']
+            )
+            review.save()
+    return HttpResponseRedirect('/products/' + str(request.POST['product_id']))
