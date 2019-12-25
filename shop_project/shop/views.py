@@ -54,7 +54,7 @@ def order_details(request, order_id):
     return render(request, "shop/order_details.html", {'total_price': total_price, 'products': products})
 
 
-def order(request):
+def order(request):  # sprawdzic czy dobrze dzialaja zamowienia
     products_to_order = _get_products_in_cart(request)
     if request.method == 'POST':
         form = OrderForm(request.POST)
@@ -71,8 +71,9 @@ def order(request):
             )
             order.save()
 
-            for product in products_to_order:
-                OrderedProduct(product=product, order=order, amount=1).save()
+            for product, amount in zip(products_to_order.keys(), products_to_order.values()):
+                OrderedProduct(product=product, order=order,
+                               amount=amount).save()
             request.session['cart'] = []
             return HttpResponseRedirect('/order/'+str(order.id))
     else:
@@ -99,27 +100,64 @@ def complaint_details(request, complaint_id):
     complaint = get_object_or_404(Complaint, pk=complaint_id)
     return render(request, "shop/complaint_details.html", {'name': complaint.name, 'message': complaint.message})
 
+# CART HANDLING
+
 
 def cart(request):
     products_in_cart = _get_products_in_cart(request)
-    return render(request, "shop/cart.html", {"products": products_in_cart})
+    products = zip(products_in_cart.keys(), products_in_cart.values())
+    price_total = _cart_total_price(request)
+    return render(request, "shop/cart.html", {"products": products, "price_total": price_total})
 
 
 def _get_products_in_cart(request):
-    products_in_cart = []
-    for item_id in request.session.get('cart', []):
+    products_in_cart = dict()
+    cart_dict = request.session.get('cart', dict())
+    for item_id in cart_dict.keys():
         product = Product.objects.get(pk=item_id)
-        products_in_cart.append(product)
+        products_in_cart[product] = cart_dict[item_id]
     return products_in_cart
 
 
 def add_to_cart(request):
     if request.method == "POST":
+        # request.session['cart'] = dict()  # temporary
         if 'cart' not in request.session:
-            request.session['cart'] = []
-        request.session['cart'].append(request.POST['item_id'])
+            request.session['cart'] = dict()
+            # tuples (product, amount)
+        product_id = request.POST['item_id']
+        if product_id in request.session['cart'].keys():
+            request.session['cart'][product_id] += 1
+        else:
+            request.session['cart'][product_id] = 1
         request.session.modified = True
     return HttpResponseRedirect('/cart')
+
+
+def delete_from_cart(request):
+    if request.method == "POST":
+        del request.session['cart'][request.POST['item_id']]
+        request.session.modified = True
+    return HttpResponseRedirect('/cart')
+
+
+def cart_amount_change(request):
+    if request.method == "POST":
+        form = AmountForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+            request.session['cart'][request.POST['product_id']] = amount
+            request.session.modified = True
+    return HttpResponseRedirect('/cart')
+
+
+def _cart_total_price(request):
+    products_in_cart = _get_products_in_cart(request)
+    products = zip(products_in_cart.keys(), products_in_cart.values())
+    price_total = 0
+    for product, amount in products:
+        price_total += product.price * amount
+    return price_total
 
 # Review handling
 

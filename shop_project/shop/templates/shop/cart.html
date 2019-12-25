@@ -1,10 +1,55 @@
 {% extends "base.html" %}
 {% block content %}
-<ul>
-    {% for product in products %}
-    <li>{{ product.name }} {{ product.price }} </li>
-    {% endfor %}
-</ul>
+<table cellspacing="0" cellpadding="0">
+    <tbody>
+        <col width="100">
+        <col width="100">
+        <col width="300">
+        <col width="100">
+        <tr>
+            <td>
+                <h3>Product</h3>
+            </td>
+            <td>
+                <h3>Price</h3>
+            </td>
+            <td>
+                <h3>Amount</h3>
+            </td>
+            <td></td>
+        </tr>
+        {% for product, amount in products %}
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ product.price }}</td>
+            <td>
+                <form action="/cart/amount_change/" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="amount" value="{{ amount }}">
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <input type="submit" value="Change amount">
+                </form>
+            </td>
+            <td>
+                <form action="/cart/delete/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" value="{{ product.id }}">
+                    <input type="submit" value="Delete from cart">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        <td>
+            <h4>Price total</h4>
+        </td>
+        <td>
+            <h4>{{ price_total }}</h4>
+        </td>
+        <td></td>
+        <td></td>
+        </tr>
+    </tbody>
+</table>
 <p><a href="/order/">Make an order</a></p>
 <p><a href="/products/">Go to products list</a></p>
 {% endblock %}
