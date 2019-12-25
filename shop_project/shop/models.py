@@ -14,6 +14,9 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+class Discount(models.Model):
+    code = models.CharField(max_length=10, primary_key = True)
+    discount = models.IntegerField()
 
 class Order(models.Model):
 
@@ -34,6 +37,9 @@ class Order(models.Model):
     delivery = models.CharField(max_length=7, choices=DELIVERY_CHOICES)
     ordered_products = models.ManyToManyField(
         "Product", through="OrderedProduct")
+    discount = models.ForeignKey(Discount, on_delete=models.PROTECT,
+    default = None, null = True
+    )
 
     def __str__(self):
         return str(self.id) + '_' + self.name + '_' + self.surname
@@ -54,6 +60,13 @@ class Order(models.Model):
             products.append({'name': ordered_product.product.name,
                              'amount': ordered_product.amount, 'price': ordered_product.product.price})
         return products
+
+    def get_discount(self):
+        d = self.discount
+        if (d == None):
+            return 0
+        else:
+            return d.discount
 
 
 class OrderedProduct(models.Model):

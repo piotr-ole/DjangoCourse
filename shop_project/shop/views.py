@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from .forms import OrderForm, ComplaintForm, ReviewForm
-from .models import Product, Order, Complaint, OrderedProduct, Review
+from .models import Product, Order, Complaint, OrderedProduct, Review, Discount
 import pdb
 from statistics import mean
 
@@ -51,13 +51,19 @@ def order_details(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
     total_price = order.get_total_price()
     products = order.get_product_list()
-    return render(request, "shop/order_details.html", {'total_price': total_price, 'products': products})
+    discount = order.get_discount()
+    return render(request, "shop/order_details.html", {'total_price': total_price, 'products': products,
+                                                       'discount': f"{discount}%",
+                                                       "final_price": total_price * (100 - discount) / 100})
 
 
 def order(request):  # sprawdzic czy dobrze dzialaja zamowienia
     products_to_order = _get_products_in_cart(request)
     if request.method == 'POST':
         form = OrderForm(request.POST)
+        if _is_discount_object(request.POST['discount']) != True:
+            return render(request, "shop/order_form.html", {"form": form, "products": products_to_order,
+                                                            "discount": "The code is not valid"})
         if form.is_valid():
             order = Order(
                 name=form.cleaned_data['name'],
@@ -67,18 +73,38 @@ def order(request):  # sprawdzic czy dobrze dzialaja zamowienia
                 street=form.cleaned_data['street'],
                 building_number=form.cleaned_data['building_number'],
                 apartament_number=form.cleaned_data['apartament_number'],
-                delivery=form.cleaned_data['delivery']
+                delivery=form.cleaned_data['delivery'],
+                discount=_get_discount_object(request.POST['discount'])
             )
             order.save()
 
             for product, amount in zip(products_to_order.keys(), products_to_order.values()):
                 OrderedProduct(product=product, order=order,
                                amount=amount).save()
-            request.session['cart'] = []
+            request.session['cart'] = dict()
             return HttpResponseRedirect('/order/'+str(order.id))
     else:
         form = OrderForm()
-    return render(request, "shop/order_form.html", {"form": form, "products": products_to_order})
+    return render(request, "shop/order_form.html", {"form": form, "products": products_to_order, "discount": ""})
+
+
+def _is_discount_object(discount_pk):
+    try:
+        discount = Discount.objects.get(pk=discount_pk)
+        return True
+    except Discount.DoesNotExist:
+        if discount_pk == 'Type a discount code' or discount_pk == '':
+            return True
+        return False
+        # COMPLAINT
+
+
+def _get_discount_object(discount_pk):
+    try:
+        discount = Discount.objects.get(pk=discount_pk)
+        return discount
+    except Discount.DoesNotExist:
+        return Discount.objects.get(pk='EMPTY')
 
 
 def complaint(request):
@@ -124,6 +150,9 @@ def add_to_cart(request):
         # request.session['cart'] = dict()  # temporary
         if 'cart' not in request.session:
             request.session['cart'] = dict()
+        # byc moze tego elifa mozna usunac
+        elif type(request.session['cart']) == list:
+            request.session['cart'] = dict()
             # tuples (product, amount)
         product_id = request.POST['item_id']
         if product_id in request.session['cart'].keys():
@@ -143,11 +172,9 @@ def delete_from_cart(request):
 
 def cart_amount_change(request):
     if request.method == "POST":
-        form = AmountForm(request.POST)
-        if form.is_valid():
-            amount = form.cleaned_data['amount']
-            request.session['cart'][request.POST['product_id']] = amount
-            request.session.modified = True
+        request.session['cart'][request.POST['product_id']] = int(
+            request.POST['amount'])
+        request.session.modified = True
     return HttpResponseRedirect('/cart')
 
 

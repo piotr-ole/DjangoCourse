@@ -5,5 +5,8 @@
 <form action="/order/" method="post">
     {% csrf_token %}
     {{ form|linebreaksbr }}
+    <br>
+    <input type="text" name="discount" value="Type a discount code">
     <input type="submit" value="Submit"> </form>
+{{ discount }}
 {% endblock %}
