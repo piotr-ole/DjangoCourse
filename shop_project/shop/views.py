@@ -59,10 +59,12 @@ def order_details(request, order_id):
 
 def order(request):  # sprawdzic czy dobrze dzialaja zamowienia
     products_to_order = _get_products_in_cart(request)
+    total_price = _cart_total_price(request)
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if _is_discount_object(request.POST['discount']) != True:
             return render(request, "shop/order_form.html", {"form": form, "products": products_to_order,
+                                                            "total_price" : total_price,
                                                             "discount": "The code is not valid"})
         if form.is_valid():
             order = Order(
@@ -85,7 +87,10 @@ def order(request):  # sprawdzic czy dobrze dzialaja zamowienia
             return HttpResponseRedirect('/order/'+str(order.id))
     else:
         form = OrderForm()
-    return render(request, "shop/order_form.html", {"form": form, "products": products_to_order, "discount": ""})
+    products = zip(products_to_order.keys(), products_to_order.values()) # products, amounts
+    #pdb.set_trace()
+    return render(request, "shop/order_form.html", {"form": form, "products": products, 
+                                                    "total_price" : total_price, "discount": ""})
 
 
 def _is_discount_object(discount_pk):

@@ -1,12 +1,68 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Order form</h3>
-<ul> {% for product in products %} <li>{{ product.name }} ({{ product.price }})</li> {% endfor %}</ul>
+<h2>Make an order</h2>
+<h3>Order summary</h3>
+<table width="300" cellspacing="0" cellpadding="0">
+    <tbody>
+        <tr>
+            <td>
+                <h4>Product</h4>
+            </td>
+            <td>
+                <h4>Amount</h4>
+            </td>
+            <td>
+                <h4>Price</h4>
+            </td>
+        </tr>
+        {% for product, amount in products %}
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ amount }}</td>
+            <td>{{ product.price }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <h4>Total price </h4>
+            </td>
+            <td></td>
+            <td>
+                <h4>{{ total_price }}</h4>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+    </tbody>
+</table>
+<h3>Personal information</h3>
 <form action="/order/" method="post">
     {% csrf_token %}
-    {{ form|linebreaksbr }}
+    <table>
+        <tbody>
+            <col width="150">
+            <col width="80">
+            {% for field in form %}
+            <tr>
+                <td>{{ field.label_tag }}</td>
+                <td>{{ field }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     <br>
+    <h3>Discount Code</h3>
     <input type="text" name="discount" value="Type a discount code">
-    <input type="submit" value="Submit"> </form>
-{{ discount }}
+    <font color="red">{{ discount }}</font>
+    <br><br>
+    <input type="submit" value="Submit order">
+</form>
 {% endblock %}
