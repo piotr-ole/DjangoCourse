@@ -59,13 +59,15 @@ def order_details(request, order_id):
 
 def order(request):  # sprawdzic czy dobrze dzialaja zamowienia
     products_to_order = _get_products_in_cart(request)
+    products = zip(products_to_order.keys(),
+                   products_to_order.values())  # Products, amounts
     total_price = _cart_total_price(request)
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if _is_discount_object(request.POST['discount']) != True:
-            return render(request, "shop/order_form.html", {"form": form, "products": products_to_order,
-                                                            "total_price" : total_price,
-                                                            "discount": "The code is not valid"})
+            return render(request, "shop/order_form.html", {"form": form, "products": products,
+                                                            "total_price": total_price,
+                                                            "discount_message": "The code is not valid"})
         if form.is_valid():
             order = Order(
                 name=form.cleaned_data['name'],
@@ -80,17 +82,16 @@ def order(request):  # sprawdzic czy dobrze dzialaja zamowienia
             )
             order.save()
 
-            for product, amount in zip(products_to_order.keys(), products_to_order.values()):
+            for product, amount in products:
                 OrderedProduct(product=product, order=order,
                                amount=amount).save()
             request.session['cart'] = dict()
             return HttpResponseRedirect('/order/'+str(order.id))
     else:
         form = OrderForm()
-    products = zip(products_to_order.keys(), products_to_order.values()) # products, amounts
-    #pdb.set_trace()
-    return render(request, "shop/order_form.html", {"form": form, "products": products, 
-                                                    "total_price" : total_price, "discount": ""})
+    # pdb.set_trace()
+    return render(request, "shop/order_form.html", {"form": form, "products": products,
+                                                    "total_price": total_price, "discount_message": ""})
 
 
 def _is_discount_object(discount_pk):
@@ -101,7 +102,6 @@ def _is_discount_object(discount_pk):
         if discount_pk == 'Type a discount code' or discount_pk == '':
             return True
         return False
-        # COMPLAINT
 
 
 def _get_discount_object(discount_pk):
@@ -110,6 +110,8 @@ def _get_discount_object(discount_pk):
         return discount
     except Discount.DoesNotExist:
         return Discount.objects.get(pk='EMPTY')
+
+# COMPLAINT
 
 
 def complaint(request):
