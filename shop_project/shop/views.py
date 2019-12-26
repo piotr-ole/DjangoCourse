@@ -42,7 +42,7 @@ def product_details(request, product_id):
 
 def mean_rating(reviews):
     if reviews != []:
-        return mean([r.rating for r in reviews])
+        return f"{round(mean([r.rating for r in reviews]), 2)} / 10"
     else:
         return 'No ratings so far'
 

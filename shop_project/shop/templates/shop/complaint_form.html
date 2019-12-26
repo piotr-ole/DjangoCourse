@@ -3,6 +3,35 @@
 <h3>Complaint form</h3>
 <form action="/complaint/" method="post">
     {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit"> </form>
+    <input type="hidden" name="product_id" value="{{ product.id }}">
+    <table cellspacing="0" cellpadding="0">
+        <tbody>
+            <col width="350">
+            <col width="130">
+            <col width="100">
+            <tr>
+                <td>
+                    <h4>Message</h4>
+                </td>
+                <td style="text-align:center">
+                    <h4>Name</h4>
+                </td>
+                <td>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{form.message}}
+                </td>
+                <td style="text-align:center; vertical-align:top">
+                    {{form.name}}
+                </td>
+                <td style="text-align:center; vertical-align:top">
+                    <input type="submit" value="Submit">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
 {% endblock %}

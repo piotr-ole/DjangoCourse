@@ -14,12 +14,18 @@ class OrderForm(ModelForm):
 
 
 class ComplaintForm(ModelForm):
+    message = forms.CharField(
+        widget=forms.Textarea(attrs={'cols': 40, 'rows': 10}))
+
     class Meta:
         model = Complaint
-        fields = ['name', 'message']
+        fields = ['name']
 
 
 class ReviewForm(ModelForm):
+    comment = forms.CharField(
+        widget=forms.Textarea(attrs={'cols': 40, 'rows': 10}))
+
     class Meta:
         model = Review
-        fields = ['comment', 'rating']
+        fields = ['rating']

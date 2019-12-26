@@ -1,59 +1,128 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Product details</h3>
-    <h3>ID</h3>
-    {{ product.id }}
-    <h3>Name</h3>
-    {{ product.name }}
-    <h3>Weight</h3>
-    {{ product.weight }}
-    <h3>Description</h3>
-    {{ product.description }}
-    <h3>Price</h3>
-    {{ product.price }}
-    <br><br>
-    <form action="/cart/add/" method="post">
-        {% csrf_token %}
-        <input type="hidden" name="item_id" value="{{ product.id }}">
-        <input type="submit" value="Add to cart">
-    </form>
-
-    <a href=".">Go back to products</a>
-    <br><br>Mean rating: {{ mean_rating }}<br><br>
+<h2>{{ product.name }}</h2>
+<br>
+<form action="/cart/add/" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="item_id" value="{{ product.id }}">
+    <input type="submit" value="Add to cart">
+</form>
+<table width="300" cellspacing="13" cellpadding="0">
+    <col width="150">
+    <col width="400">
+    <tbody>
+        <tr>
+            <td>
+                <b>Name</b>
+            </td>
+            <td>
+                {{ product.name }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <b>Weight</b>
+            </td>
+            <td>
+                {{ product.weight }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <b>Description</b>
+            </td>
+            <td>
+                {{ product.description }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <b>Price</b>
+            </td>
+            <td>
+                {{  product.price }}
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <b>Mean rating</b>
+            </td>
+            <td>
+                <b>{{ mean_rating }}</b>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<br><br>
+<a href=".">Go back to products</a><br><br><br><br>
+<table cellspacing="0" cellpadding="0">
+    <tbody>
+        <col width="400">
+        <col width="100">
+        <tr>
+            <td>
+                <h3>Comments</h3>
+            </td>
+            <td style="text-align:center">
+                <h3>Ratings</h3>
+            </td>
+        </tr>
+        {% for review in reviews %}
+        <tr>
+            <td style="text-align:justify">{{ review.comment }}</td>
+            <td style="text-align:center">{{ review.rating }} / 10</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h4>Add Review</h4>
+<form action="/review/add/" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="product_id" value="{{ product.id }}">
     <table cellspacing="0" cellpadding="0">
         <tbody>
             <col width="300">
-            <col width="40">
+            <col width="130">
+            <col width="100">
             <tr>
                 <td>
-                    <h3>Comments</h3>
+                    <h4>Comment</h4>
                 </td>
+                <td style="text-align:center">
+                    <h4>Rating</h4>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
                 <td>
-                    <h3>Ratings</h3>
+                    {{form.comment}}
+                </td>
+                <td style="text-align:center; vertical-align:top">
+                    {{form.rating}}
+                </td>
+                <td style="text-align:center; vertical-align:top">
+                    <input type="submit" value="Add review">
                 </td>
             </tr>
-            {% for review in reviews %}
-            <tr>
-                <td>{{ review.comment }}</td>
-                <td style="text-align:center">{{ review.rating }}</tdstyle="text-align:center">
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-            {% endfor %}
         </tbody>
     </table>
-    <h4>Add Comment</h4>
-    <form action="/review/add/" method="post">
-        {% csrf_token %}
-        {{ form }}
-        <input type="hidden" name="product_id" value="{{ product.id }}">
-        <input type="submit" value="Add review">
-    </form>
-    {% endblock %}
+</form>
+<br><br><br>
+{% endblock %}
