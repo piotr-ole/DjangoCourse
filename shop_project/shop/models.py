@@ -12,11 +12,14 @@ class Product(models.Model):
     weight = models.FloatField(default=0)
 
     def __str__(self):
-        return self.name
+        return str(self.id) + '_' + self.name
 
 class Discount(models.Model):
     code = models.CharField(max_length=10, primary_key = True)
     discount = models.IntegerField()
+
+    def __str__(self):
+        return self.code + '_' + str(self.discount)
 
 class Order(models.Model):
 
@@ -75,10 +78,16 @@ class OrderedProduct(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     amount = models.IntegerField(default=1)
 
+    def __str__(self):
+        return str(self.order) + '_' +  str(self.product)
+
 
 class Complaint(models.Model):
     name = models.CharField(max_length=100)
     message = models.CharField(max_length=3000)
+
+    def __str__(self):
+        return str(self.id) + '_' + self.name
 
 
 class Review(models.Model):
@@ -87,3 +96,6 @@ class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
     comment = models.CharField(max_length=3000)
+
+    def __str__(self):
+        return str(self.id) + '_' + str(self.product)
