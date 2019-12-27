@@ -8,6 +8,7 @@ from statistics import mean
 
 shop_introduction = "Welcome in the shop: \"Zoo Animations For Curious Animators\"!"
 
+###### BASE #######
 
 def index(request):
     return render(request, 'shop/index.html')
@@ -22,6 +23,7 @@ def shop_account(request, name):
     global shop_introduction
     return render(request, 'shop/client.html', {'client_name': name})
 
+###### PRODUCTS ########
 
 def products_list(request):
     products = Product.objects.order_by('id')
@@ -46,6 +48,7 @@ def mean_rating(reviews):
     else:
         return 'No ratings so far'
 
+####### ORDER ########
 
 def order_details(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
@@ -57,10 +60,10 @@ def order_details(request, order_id):
                                                        "final_price": total_price * (100 - discount) / 100})
 
 
-def order(request):  # sprawdzic czy dobrze dzialaja zamowienia
+def order(request):
     products_to_order = _get_products_in_cart(request)
     products = zip(products_to_order.keys(),
-                   products_to_order.values())  # Products, amounts
+                   products_to_order.values())  # keys: product_ids, values : amounts
     total_price = _cart_total_price(request)
     if request.method == 'POST':
         form = OrderForm(request.POST)
@@ -89,7 +92,6 @@ def order(request):  # sprawdzic czy dobrze dzialaja zamowienia
             return HttpResponseRedirect('/order/'+str(order.id))
     else:
         form = OrderForm()
-    # pdb.set_trace()
     return render(request, "shop/order_form.html", {"form": form, "products": products,
                                                     "total_price": total_price, "discount_message": ""})
 
@@ -109,9 +111,9 @@ def _get_discount_object(discount_pk):
         discount = Discount.objects.get(pk=discount_pk)
         return discount
     except Discount.DoesNotExist:
-        return Discount.objects.get(pk='EMPTY')
+        return Discount.objects.get(pk='EMPTY') # 0% 'EMPTY' code in Discount table
 
-# COMPLAINT
+####### COMPLAINT ########
 
 
 def complaint(request):
@@ -133,7 +135,7 @@ def complaint_details(request, complaint_id):
     complaint = get_object_or_404(Complaint, pk=complaint_id)
     return render(request, "shop/complaint_details.html", {'name': complaint.name, 'message': complaint.message})
 
-# CART HANDLING
+###### CART #######
 
 
 def cart(request):
@@ -154,13 +156,9 @@ def _get_products_in_cart(request):
 
 def add_to_cart(request):
     if request.method == "POST":
-        # request.session['cart'] = dict()  # temporary
         if 'cart' not in request.session:
             request.session['cart'] = dict()
-        # byc moze tego elifa mozna usunac
-        elif type(request.session['cart']) == list:
-            request.session['cart'] = dict()
-            # tuples (product, amount)
+        # Dict:: keys: products_ids, values: amounts)
         product_id = request.POST['item_id']
         if product_id in request.session['cart'].keys():
             request.session['cart'][product_id] += 1
@@ -193,7 +191,7 @@ def _cart_total_price(request):
         price_total += product.price * amount
     return price_total
 
-# Review handling
+###### REVIEW ######
 
 
 def add_review(request):
